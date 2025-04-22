@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap12bind="http://schemas.xmlsoap.org/wsdl/soap12/"
+		xmlns:soapbind="http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns:tns="http://localhost/shawarman2"
+		xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns:xsd1="http://localhost/shawarman2"
+		name="Заказы"
+		targetNamespace="http://localhost/shawarman2">
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns:xs1="http://localhost/shawarman2"
+				targetNamespace="http://localhost/shawarman2"
+				attributeFormDefault="unqualified"
+				elementFormDefault="qualified">
+			<xs:complexType name="Ответ">
+				<xs:sequence>
+					<xs:element name="Текст"
+							type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="ЗакрытьЗаказ">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="НомерЗаказа"
+								type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ЗакрытьЗаказResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="return"
+								type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</types>
+	<message name="ЗакрытьЗаказRequestMessage">
+		<part name="parameters"
+				element="tns:ЗакрытьЗаказ"/>
+	</message>
+	<message name="ЗакрытьЗаказResponseMessage">
+		<part name="parameters"
+				element="tns:ЗакрытьЗаказResponse"/>
+	</message>
+	<portType name="ЗаказыPortType">
+		<operation name="ЗакрытьЗаказ">
+			<input name="ЗакрытьЗаказRequest"
+					message="tns:ЗакрытьЗаказRequestMessage"/>
+			<output name="ЗакрытьЗаказResponse"
+					message="tns:ЗакрытьЗаказResponseMessage"/>
+		</operation>
+	</portType>
+	<binding name="ЗаказыSoapBinding"
+			type="tns:ЗаказыPortType">
+		<soapbind:binding style="document"
+				transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ЗакрытьЗаказ">
+			<soapbind:operation style="document"
+					soapAction="http://localhost/shawarman2#Заказы:ЗакрытьЗаказ"/>
+			<input>
+				<soapbind:body use="literal"/>
+			</input>
+			<output>
+				<soapbind:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<binding name="ЗаказыSoap12Binding"
+			type="tns:ЗаказыPortType">
+		<soap12bind:binding style="document"
+				transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ЗакрытьЗаказ">
+			<soap12bind:operation style="document"
+					soapAction="http://localhost/shawarman2#Заказы:ЗакрытьЗаказ"/>
+			<input>
+				<soap12bind:body use="literal"/>
+			</input>
+			<output>
+				<soap12bind:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="Заказы">
+		<port name="ЗаказыSoap"
+				binding="tns:ЗаказыSoapBinding">
+			<documentation> 
+				<wsi:Claim xmlns:wsi="http://ws-i.org/schemas/conformanceClaim/"
+						conformsTo="http://ws-i.org/profiles/basic/1.1"/>
+			</documentation>
+			<soapbind:address location="http://127.0.0.1/ShawarmaN1/ws/orders3ws1.1cws"/>
+		</port>
+		<port name="ЗаказыSoap12"
+				binding="tns:ЗаказыSoap12Binding">
+			<soap12bind:address location="http://127.0.0.1/ShawarmaN1/ws/orders3ws1.1cws"/>
+		</port>
+	</service>
+</definitions>

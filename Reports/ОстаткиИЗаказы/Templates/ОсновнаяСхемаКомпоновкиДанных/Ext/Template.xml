@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<DataCompositionSchema xmlns="http://v8.1c.ru/8.1/data-composition-system/schema" xmlns:dcscom="http://v8.1c.ru/8.1/data-composition-system/common" xmlns:dcscor="http://v8.1c.ru/8.1/data-composition-system/core" xmlns:dcsset="http://v8.1c.ru/8.1/data-composition-system/settings" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<dataSource>
+		<name>ИсточникДанных1</name>
+		<dataSourceType>Local</dataSourceType>
+	</dataSource>
+	<dataSet xsi:type="DataSetQuery">
+		<name>НаборДанных1</name>
+		<field xsi:type="DataSetFieldField">
+			<dataPath>Заказано</dataPath>
+			<field>Заказано</field>
+			<title xsi:type="v8:LocalStringType">
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Заказано</v8:content>
+				</v8:item>
+			</title>
+		</field>
+		<field xsi:type="DataSetFieldField">
+			<dataPath>Номенклатура</dataPath>
+			<field>Номенклатура</field>
+		</field>
+		<field xsi:type="DataSetFieldField">
+			<dataPath>Заведение</dataPath>
+			<field>Заведение</field>
+		</field>
+		<field xsi:type="DataSetFieldField">
+			<dataPath>Партия</dataPath>
+			<field>Партия</field>
+		</field>
+		<field xsi:type="DataSetFieldField">
+			<dataPath>Продукт</dataPath>
+			<field>Продукт</field>
+		</field>
+		<field xsi:type="DataSetFieldField">
+			<dataPath>НеобходимоДозаказать</dataPath>
+			<field>НеобходимоДозаказать</field>
+			<title xsi:type="v8:LocalStringType">
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Необходимо дозаказать</v8:content>
+				</v8:item>
+			</title>
+		</field>
+		<field xsi:type="DataSetFieldField">
+			<dataPath>МинимальноеКоличество</dataPath>
+			<field>МинимальноеКоличество</field>
+		</field>
+		<field xsi:type="DataSetFieldField">
+			<dataPath>КоличествоОстаток</dataPath>
+			<field>КоличествоОстаток</field>
+			<title xsi:type="v8:LocalStringType">
+				<v8:item>
+					<v8:lang>ru</v8:lang>
+					<v8:content>Количество остаток</v8:content>
+				</v8:item>
+			</title>
+		</field>
+		<dataSource>ИсточникДанных1</dataSource>
+		<query>ВЫБРАТЬ
+	Продукты.МинимальноеКоличество КАК МинимальноеКоличество,
+	Продукты.Ссылка КАК Продукт
+ПОМЕСТИТЬ ВтПродукты
+ИЗ
+	Справочник.Продукты КАК Продукты
+ГДЕ
+	Продукты.ПометкаУдаления = ЛОЖЬ
+
+ИНДЕКСИРОВАТЬ ПО
+	Продукт
+;
+
+////////////////////////////////////////////////////////////////////////////////
+ВЫБРАТЬ
+	ИнгредиентыВНаличииОстатки.Номенклатура КАК Номенклатура,
+	ИнгредиентыВНаличииОстатки.КоличествоОстаток КАК КоличествоОстаток
+ПОМЕСТИТЬ ВтОстатки
+ИЗ
+	РегистрНакопления.ИнгредиентыВНаличии.Остатки(
+			,
+			Номенклатура В
+				(ВЫБРАТЬ
+					ВтПродукты.Продукт КАК Продукт
+				ИЗ
+					ВтПродукты КАК ВтПродукты)) КАК ИнгредиентыВНаличииОстатки
+
+ИНДЕКСИРОВАТЬ ПО
+	Номенклатура
+;
+
+////////////////////////////////////////////////////////////////////////////////
+ВЫБРАТЬ
+	ЗаказыПродуктовОстатки.Продукт КАК Продукт,
+	ЕСТЬNULL(ЗаказыПродуктовОстатки.КоличествоОстаток, 0) КАК КоличествоОстаток
+ПОМЕСТИТЬ ВтЗакупки
+ИЗ
+	РегистрНакопления.ЗаказыПродуктов.Остатки(
+			,
+			Продукт В
+				(ВЫБРАТЬ
+					ВтПродукты.Продукт КАК Продукт
+				ИЗ
+					ВтПродукты КАК ВтПродукты)) КАК ЗаказыПродуктовОстатки
+;
+
+////////////////////////////////////////////////////////////////////////////////
+ВЫБРАТЬ
+	ВтПродукты.Продукт КАК Продукт,
+	ВтПродукты.МинимальноеКоличество КАК МинимальноеКоличество,
+	ЕСТЬNULL(ВтОстатки.КоличествоОстаток, 0) КАК КоличествоОстаток,
+	ЕСТЬNULL(ВтЗакупки.КоличествоОстаток, 0) КАК Заказано,
+	ВЫБОР
+		КОГДА ВтПродукты.МинимальноеКоличество &gt; ЕСТЬNULL(ВтОстатки.КоличествоОстаток, 0) + ЕСТЬNULL(ВтЗакупки.КоличествоОстаток, 0)
+			ТОГДА ВтПродукты.МинимальноеКоличество - (ЕСТЬNULL(ВтОстатки.КоличествоОстаток, 0) + ЕСТЬNULL(ВтЗакупки.КоличествоОстаток, 0))
+		ИНАЧЕ 0
+	КОНЕЦ КАК НеобходимоДозаказать
+ИЗ
+	ВтПродукты КАК ВтПродукты
+		ЛЕВОЕ СОЕДИНЕНИЕ ВтОстатки КАК ВтОстатки
+		ПО ВтПродукты.Продукт = ВтОстатки.Номенклатура
+		ЛЕВОЕ СОЕДИНЕНИЕ ВтЗакупки КАК ВтЗакупки
+		ПО ВтПродукты.Продукт = ВтЗакупки.Продукт
+</query>
+	</dataSet>
+	<parameter>
+		<name>Период</name>
+		<title xsi:type="v8:LocalStringType">
+			<v8:item>
+				<v8:lang>ru</v8:lang>
+				<v8:content>Период</v8:content>
+			</v8:item>
+		</title>
+		<valueType>
+			<v8:Type>xs:dateTime</v8:Type>
+			<v8:DateQualifiers>
+				<v8:DateFractions>DateTime</v8:DateFractions>
+			</v8:DateQualifiers>
+		</valueType>
+		<value xsi:type="xs:dateTime">0001-01-01T00:00:00</value>
+		<useRestriction>false</useRestriction>
+	</parameter>
+	<settingsVariant>
+		<dcsset:name>Основной</dcsset:name>
+		<dcsset:presentation xsi:type="xs:string">Основной</dcsset:presentation>
+		<dcsset:settings xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows">
+			<dcsset:selection>
+				<dcsset:item xsi:type="dcsset:SelectedItemField">
+					<dcsset:field>Продукт</dcsset:field>
+				</dcsset:item>
+				<dcsset:item xsi:type="dcsset:SelectedItemField">
+					<dcsset:field>МинимальноеКоличество</dcsset:field>
+				</dcsset:item>
+				<dcsset:item xsi:type="dcsset:SelectedItemField">
+					<dcsset:field>КоличествоОстаток</dcsset:field>
+				</dcsset:item>
+				<dcsset:item xsi:type="dcsset:SelectedItemField">
+					<dcsset:field>Заказано</dcsset:field>
+				</dcsset:item>
+				<dcsset:item xsi:type="dcsset:SelectedItemField">
+					<dcsset:field>НеобходимоДозаказать</dcsset:field>
+				</dcsset:item>
+			</dcsset:selection>
+			<dcsset:item xsi:type="dcsset:StructureItemGroup">
+				<dcsset:order>
+					<dcsset:item xsi:type="dcsset:OrderItemAuto"/>
+				</dcsset:order>
+				<dcsset:selection>
+					<dcsset:item xsi:type="dcsset:SelectedItemAuto"/>
+				</dcsset:selection>
+			</dcsset:item>
+		</dcsset:settings>
+	</settingsVariant>
+</DataCompositionSchema>

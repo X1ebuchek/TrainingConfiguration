@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap12bind="http://schemas.xmlsoap.org/wsdl/soap12/"
+		xmlns:soapbind="http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns:tns="http://localhost/shawarman1"
+		xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns:xsd1="http://localhost/shawarman1"
+		name="ЗаказыПоставщику"
+		targetNamespace="http://localhost/shawarman1">
+	<types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns:xs1="http://localhost/shawarman1"
+				targetNamespace="http://localhost/shawarman1"
+				attributeFormDefault="unqualified"
+				elementFormDefault="qualified">
+			<xs:complexType name="Заказы">
+				<xs:sequence>
+					<xs:element name="Заказ"
+							type="xsd1:Заказ"
+							maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="Заказ">
+				<xs:sequence>
+					<xs:element name="ПредставлениеЗаказа"
+							type="xs:string"/>
+					<xs:element name="Поставщик"
+							type="xs:string"/>
+					<xs:element name="Менеджер"
+							type="xs:string"/>
+					<xs:element name="Продукты"
+							type="xsd1:Продукты"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="Продукты">
+				<xs:sequence>
+					<xs:element name="СтрокаПродукты"
+							type="xsd1:СтрокаПродукты"
+							maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="СтрокаПродукты">
+				<xs:sequence>
+					<xs:element name="Продукт"
+							type="xs:string"/>
+					<xs:element name="Количество"
+							type="xs:decimal"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="ПолучитьЗаказы">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ПолучитьЗаказыResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="return"
+								type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</types>
+	<message name="ПолучитьЗаказыRequestMessage">
+		<part name="parameters"
+				element="tns:ПолучитьЗаказы"/>
+	</message>
+	<message name="ПолучитьЗаказыResponseMessage">
+		<part name="parameters"
+				element="tns:ПолучитьЗаказыResponse"/>
+	</message>
+	<portType name="ЗаказыПоставщикуPortType">
+		<operation name="ПолучитьЗаказы">
+			<input name="ПолучитьЗаказыRequest"
+					message="tns:ПолучитьЗаказыRequestMessage"/>
+			<output name="ПолучитьЗаказыResponse"
+					message="tns:ПолучитьЗаказыResponseMessage"/>
+		</operation>
+	</portType>
+	<binding name="ЗаказыПоставщикуSoapBinding"
+			type="tns:ЗаказыПоставщикуPortType">
+		<soapbind:binding style="document"
+				transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ПолучитьЗаказы">
+			<soapbind:operation style="document"
+					soapAction="http://localhost/shawarman1#ЗаказыПоставщику:ПолучитьЗаказы"/>
+			<input>
+				<soapbind:body use="literal"/>
+			</input>
+			<output>
+				<soapbind:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<binding name="ЗаказыПоставщикуSoap12Binding"
+			type="tns:ЗаказыПоставщикуPortType">
+		<soap12bind:binding style="document"
+				transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="ПолучитьЗаказы">
+			<soap12bind:operation style="document"
+					soapAction="http://localhost/shawarman1#ЗаказыПоставщику:ПолучитьЗаказы"/>
+			<input>
+				<soap12bind:body use="literal"/>
+			</input>
+			<output>
+				<soap12bind:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="ЗаказыПоставщику">
+		<port name="ЗаказыПоставщикуSoap"
+				binding="tns:ЗаказыПоставщикуSoapBinding">
+			<documentation> 
+				<wsi:Claim xmlns:wsi="http://ws-i.org/schemas/conformanceClaim/"
+						conformsTo="http://ws-i.org/profiles/basic/1.1"/>
+			</documentation>
+			<soapbind:address location="http://127.0.0.1/ShawarmaN1/ws/orders2ws1.1cws"/>
+		</port>
+		<port name="ЗаказыПоставщикуSoap12"
+				binding="tns:ЗаказыПоставщикуSoap12Binding">
+			<soap12bind:address location="http://127.0.0.1/ShawarmaN1/ws/orders2ws1.1cws"/>
+		</port>
+	</service>
+</definitions>

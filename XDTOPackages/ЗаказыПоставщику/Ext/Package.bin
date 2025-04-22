@@ -1,0 +1,18 @@
+﻿<package xmlns="http://v8.1c.ru/8.1/xdto" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://localhost/shawarman1">
+	<objectType name="Заказы">
+		<property xmlns:d3p1="http://localhost/shawarman1" name="Заказ" type="d3p1:Заказ" upperBound="-1"/>
+	</objectType>
+	<objectType name="Заказ">
+		<property name="ПредставлениеЗаказа" type="xs:string"/>
+		<property name="Поставщик" type="xs:string"/>
+		<property name="Менеджер" type="xs:string"/>
+		<property xmlns:d3p1="http://localhost/shawarman1" name="Продукты" type="d3p1:Продукты"/>
+	</objectType>
+	<objectType name="Продукты">
+		<property xmlns:d3p1="http://localhost/shawarman1" name="СтрокаПродукты" type="d3p1:СтрокаПродукты" upperBound="-1"/>
+	</objectType>
+	<objectType name="СтрокаПродукты">
+		<property name="Продукт" type="xs:string"/>
+		<property name="Количество" type="xs:decimal"/>
+	</objectType>
+</package>
